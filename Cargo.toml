@@ -1,0 +1,8 @@
+[package]
+name = "rc5"
+edition = "2021"
+
+[dependencies]
+num = "0.4"
+num-bytes = "0.4"
+thiserror = "1.0"
