@@ -12,7 +12,7 @@ pub fn encode<W: Word>(key: &[u8], plaintext: &[u8], rounds: usize) -> Result<Ve
         return Err(Error::InvalidPlaintextLength);
     }
 
-    let expanded_key = expand_key::<W>(&key, rounds)?;
+    let expanded_key = expand_key::<W>(key, rounds)?;
     let mut ciphertext = Vec::with_capacity(plaintext.len());
     for block in plaintext.chunks(block_size) {
         let block = [
@@ -23,8 +23,7 @@ pub fn encode<W: Word>(key: &[u8], plaintext: &[u8], rounds: usize) -> Result<Ve
         ciphertext.extend(
             decode_block::<W>(&expanded_key, block)?
                 .into_iter()
-                .map(|w| w.to_le_bytes())
-                .flatten(),
+                .flat_map(|w| w.to_le_bytes()),
         );
     }
 
@@ -40,7 +39,7 @@ pub fn decode<W: Word>(key: &[u8], ciphertext: &[u8], rounds: usize) -> Result<V
     }
 
     let mut plaintext = Vec::with_capacity(ciphertext.len());
-    let expanded_key = expand_key::<W>(&key, rounds)?;
+    let expanded_key = expand_key::<W>(key, rounds)?;
     for block in ciphertext.chunks(block_size) {
         let block = [
             W::from_le_bytes(&block[0..word_bytes])?,
@@ -50,8 +49,7 @@ pub fn decode<W: Word>(key: &[u8], ciphertext: &[u8], rounds: usize) -> Result<V
         plaintext.extend(
             encode_block::<W>(&expanded_key, block)?
                 .into_iter()
-                .map(|w| w.to_le_bytes())
-                .flatten(),
+                .flat_map(|w| w.to_le_bytes()),
         );
     }
 
